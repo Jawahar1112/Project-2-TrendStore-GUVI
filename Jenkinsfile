@@ -59,17 +59,18 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
-                script {
-                    echo 'Verifying deployment...'
-                    sh """
-                        kubectl get pods -n trendify
-                        kubectl get services -n trendify
-                        echo 'Deployment verification completed'
-                    """
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS Creds']]) {
+                    script {
+                        echo 'Verifying deployment...'
+                        sh """
+                            kubectl get pods -n trendify
+                            kubectl get services -n trendify
+                            echo 'Deployment verification completed'
+                        """
+                    }
                 }
             }
         }
-    }
 
     post {
         always {
