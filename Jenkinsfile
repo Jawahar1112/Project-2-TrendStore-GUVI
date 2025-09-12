@@ -1,9 +1,8 @@
 pipeline {
     agent any
-    
+
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-        AWS_CREDENTIALS = credentials('aws-credentials')
         DOCKERHUB_USERNAME = 'jawahar11'
         IMAGE_NAME = 'trend-static-app'
         IMAGE_TAG = "${BUILD_NUMBER}"
@@ -11,7 +10,7 @@ pipeline {
         AWS_REGION = 'ap-south-1'
         KUBECONFIG = '/var/lib/jenkins/.kube/config'
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
@@ -19,7 +18,7 @@ pipeline {
                 echo 'Source code checked out successfully'
             }
         }
-        
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -29,7 +28,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Push to DockerHub') {
             steps {
                 script {
@@ -42,20 +41,22 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Update Kubernetes Deployment') {
             steps {
-                script {
-                    echo 'Updating Kubernetes deployment...'
-                    sh """
-                        aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
-                        kubectl set image deployment/trendify-deployment trendify-container=${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} -n trendify
-                        kubectl rollout status deployment/trendify-deployment -n trendify
-                    """
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                    script {
+                        echo 'Updating Kubernetes deployment...'
+                        sh """
+                            aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
+                            kubectl set image deployment/trendify-deployment trendify-container=${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} -n trendify
+                            kubectl rollout status deployment/trendify-deployment -n trendify
+                        """
+                    }
                 }
             }
         }
-        
+
         stage('Verify Deployment') {
             steps {
                 script {
@@ -69,11 +70,13 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
-            echo 'Pipeline execution completed'
-            cleanWs()
+            steps {
+                echo 'Pipeline execution completed'
+                cleanWs()
+            }
         }
         success {
             echo 'Pipeline executed successfully!'
