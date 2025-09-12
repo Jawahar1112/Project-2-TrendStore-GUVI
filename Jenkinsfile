@@ -73,10 +73,8 @@ pipeline {
 
     post {
         always {
-            steps {
-                echo 'Pipeline execution completed'
-                cleanWs()
-            }
+            echo 'Pipeline execution completed'
+            cleanWs()
         }
         success {
             echo 'Pipeline executed successfully!'
