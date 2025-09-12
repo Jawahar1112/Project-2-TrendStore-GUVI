@@ -71,6 +71,7 @@ pipeline {
                 }
             }
         }
+    } // close stages
 
     post {
         always {
