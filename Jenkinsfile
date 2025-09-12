@@ -71,7 +71,7 @@ pipeline {
                 }
             }
         }
-    } // close stages
+    } 
 
     post {
         always {
@@ -85,4 +85,4 @@ pipeline {
             echo 'Pipeline execution failed!'
         }
     }
-}
+} 
