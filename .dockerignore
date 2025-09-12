@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log*
+yarn-debug.log*
+.git
+.gitignore
+README.md
+.env
+coverage
+.vscode
+.idea
+.DS_Store
+*.log
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
