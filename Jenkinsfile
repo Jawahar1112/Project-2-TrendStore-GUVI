@@ -44,7 +44,7 @@ pipeline {
 
         stage('Update Kubernetes Deployment') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS Creds']]) {
                     script {
                         echo 'Updating Kubernetes deployment...'
                         sh """
